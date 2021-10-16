@@ -1,0 +1,21 @@
+{
+  "name": "bitcoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^16.10.1",
+    "@types/node-forge": "^0.10.5",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "merkletreejs": "^0.2.24",
+    "node-forge": "^0.10.0"
+  }
+}
