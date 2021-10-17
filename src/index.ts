@@ -1,4 +1,6 @@
+import { Block } from "./block";
 import { BlockChain } from "./blockchain";
+import { Transaction } from "./transaction";
 import { User } from "./user";
 
 var user1=new User();
@@ -34,6 +36,9 @@ console.log('\nStarting the mining...')
 chain.mine(user1.pk);
 console.log('\nBalance of miner is: '+chain.getBalanceOfAdress(user1.pk))
 
-console.log(chain.isChainValid());
+console.log("\nValidity of chain: " + chain.isChainValid());
+console.log("Chain length: "+ chain.blocks.length);
 
-
+chain.blocks.push(new Block([new Transaction(user1.pk,user2.pk,10000,"9308ed1cc01cce2d1bd6235eddbeafeb57f8a5c12c001f08609b85f216723d7b808462cc9627bea63c0906fe9a937c3bc195b3dc4513b4b54f066f86d6298a0d")], chain.getLastBlock().getHash()))
+console.log("\nIs chain valid: "+chain.isChainValid());
+console.log("Transaction in new block length: "+ chain.getLastBlock().getTransactions().length);

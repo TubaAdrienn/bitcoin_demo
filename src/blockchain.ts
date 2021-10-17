@@ -3,17 +3,16 @@ import { Transaction } from "./transaction";
 import { hashFn } from "./utilities";
 
 export class BlockChain{
-    private blocks : Block[] = []
+    public blocks : Block[] = []
     public pendingTransactions : Transaction[] = [];
     private miningReward = 100;
 
     constructor(){
-        this.createInitialBlock();
         console.log('Blockchain created.');
     }
 
     createInitialBlock(){
-        this.blocks.push(new Block([new Transaction(null,"to",0,null)], hashFn("-"))); 
+        this.blocks.push(new Block(this.pendingTransactions, hashFn("-"))); 
     }
 
     public getLastBlock(){
@@ -21,6 +20,7 @@ export class BlockChain{
     }
 
     public mine(rewardAdress: string){
+        if(this.blocks.length==0) this.createInitialBlock();
         let block = new Block(this.pendingTransactions, this.getLastBlock().getHash());
         console.log("Block mined!");
         this.blocks.push(block);
@@ -46,7 +46,6 @@ export class BlockChain{
     }
 
     isChainValid(){
-        console.log("Validation: ");
         for(let i=1; i< this.blocks.length; i++ ){
             const current = this.blocks[i];
             const prev = this.blocks[i-1];

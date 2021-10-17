@@ -54,7 +54,6 @@ export class Block{
         for(const tx of this.trs){
             if(!tx.isValid()) return false;
         }
-        console.log("Has valid transactions.");
         return true;
     }
 }

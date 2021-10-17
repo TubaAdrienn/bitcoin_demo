@@ -20,8 +20,6 @@ export class Transaction{
             signature: convertToBytes(this.sign),
             publicKey: convertToBytes(this.from)
         })
-
-        console.log("Valid transaction.");
         return isOk;
     }
 
