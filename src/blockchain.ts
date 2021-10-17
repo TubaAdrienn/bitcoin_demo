@@ -52,9 +52,7 @@ export class BlockChain{
     }
 
     isValidTr(hash: string, root: MerkleTree){
-        const hashBytes = Buffer.from(convertToBytes(hash));
-        const rootBytes = Buffer.from(convertToBytes(root.getHexRoot()));
-        const proof = root.getProof(hashBytes);
-        return root.verify(proof, hashBytes, rootBytes);
+        const hashB = Buffer.from(convertToBytes(hash));
+        return root.verify(root.getProof(hashB), hashB, Buffer.from(convertToBytes(root.getHexRoot())));
     }
 }
