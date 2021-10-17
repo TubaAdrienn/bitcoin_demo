@@ -1,6 +1,7 @@
 import { Block } from "./block";
 import { Transaction } from "./transaction";
-import { hashFn } from "./utilities";
+import { hashFn, convertToBytes } from "./utilities";
+import MerkleTree from 'merkletreejs';
 
 export class BlockChain{
     public blocks : Block[] = []
@@ -23,6 +24,11 @@ export class BlockChain{
         if(this.blocks.length==0) this.createInitialBlock();
         let block = new Block(this.pendingTransactions, this.getLastBlock().getHash());
         console.log("Block mined!");
+        
+        for(let trx of this.pendingTransactions){
+            this.isValidTr(trx.hash, this.blocks[0].tree)
+        }
+        
         this.blocks.push(block);
         this.pendingTransactions = [new Transaction(null, rewardAdress, this.miningReward,null)];
     }
@@ -33,27 +39,22 @@ export class BlockChain{
         this.pendingTransactions.push(transaction);
     }
 
-    getBalanceOfAdress(address: string){
-        let balance = 0;
-
-        for(const block of this.blocks){
-            for(const trans of block.getTransactions()){
-                if(trans.from === address) balance-=trans.amount;
-                if(trans.to === address) balance +=trans.amount;
-            }
-        }
-        return balance;
-    }
-
     isChainValid(){
         for(let i=1; i< this.blocks.length; i++ ){
             const current = this.blocks[i];
             const prev = this.blocks[i-1];
 
-            if(!current.hasValidTr()) return false;
             if(current.getHash() !== current.calculateHash()) return false;
             if(current.getPrevHash() !== prev.getHash()) return false;  
         }
+        console.log("Valid chain. ");
         return true;
+    }
+
+    isValidTr(hash: string, root: MerkleTree){
+        const hashBytes = Buffer.from(convertToBytes(hash));
+        const rootBytes = Buffer.from(convertToBytes(root.getHexRoot()));
+        const proof = root.getProof(hashBytes);
+        return root.verify(proof, hashBytes, rootBytes);
     }
 }

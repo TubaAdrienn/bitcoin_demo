@@ -1,23 +1,20 @@
 import MerkleTree from 'merkletreejs';
 import { Transaction } from './transaction';
-import {hashFn} from './utilities'
+import {convertToBytes, hashFn} from './utilities'
 
 export class Block{
     private hash:string;
     private ts : number;
     public nonce : number;
-    private tree: MerkleTree;
+    public tree: MerkleTree;
+    private root : any;
 
-    constructor(private trs: Transaction[], private prevH: string){
+    constructor(trs: Transaction[], private prevH: string){
         this.tree = new MerkleTree(trs.map(t=>t.hash),hashFn, {isBitcoinTree: true});
         this.ts = new Date().getTime();
-        this.powPowPow(this.tree.getHexRoot());
+        this.root = this.tree.getHexRoot()
+        this.powPowPow(this.root);
     }
-
-    public getTransactions(){
-        return this.trs;
-    }
-
 
     public getHash() : string{
         return this.hash;
@@ -29,7 +26,7 @@ export class Block{
     }
 
     public calculateHash() : string{
-        return hashFn(this.prevH+this.nonce.toString()+this.tree.getHexRoot());
+        return hashFn(this.prevH+this.nonce.toString()+this.ts+this.tree.getHexRoot());
     }
 
     private powPowPow(root:string) {
@@ -39,7 +36,7 @@ export class Block{
 
         while(notFound){
             nonce++;
-            hash = hashFn(this.prevH+nonce.toString()+root);
+            hash = hashFn(this.prevH+nonce.toString()+this.ts+this.root);
             if(this.isCorrectHash(hash)) notFound = false;
         }
         this.nonce = nonce;
@@ -48,13 +45,6 @@ export class Block{
 
     private isCorrectHash(hash:string) : boolean{
         return hash.startsWith('0000');
-    }
-
-    hasValidTr(){
-        for(const tx of this.trs){
-            if(!tx.isValid()) return false;
-        }
-        return true;
     }
 }
 
