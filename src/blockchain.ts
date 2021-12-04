@@ -13,7 +13,7 @@ export class BlockChain{
     }
 
     createInitialBlock(){
-        this.blocks.push(new Block(this.pendingTransactions, hashFn("-"))); 
+        return new Block(this.pendingTransactions, hashFn("-")); 
     }
 
     public getLastBlock(){
@@ -21,21 +21,22 @@ export class BlockChain{
     }
 
     public mine(rewardAdress: string){
-        if(this.blocks.length==0) this.createInitialBlock();
-        let block = new Block(this.pendingTransactions, this.getLastBlock().getHash());
+        let block;
+        if(this.blocks.length==0) block = this.createInitialBlock();
+        else block = new Block(this.pendingTransactions, this.getLastBlock().getHash());
         console.log("Block mined!");
-        
-        for(let trx of this.pendingTransactions){
-            this.isValidTr(trx.hash, this.blocks[0].tree)
-        }
-        
         this.blocks.push(block);
+
+        for(let trx of this.pendingTransactions){
+            if(!this.isInTree(trx.hash, block.tree)) console.log("Not in the tree.");
+        }
+    
         this.pendingTransactions = [new Transaction(null, rewardAdress, this.miningReward,null)];
     }
 
     addTransaction(transaction: Transaction){
         if(!transaction.from || !transaction.to) throw new Error('No address. Nope.');
-        if(!transaction.isValid()) throw new Error("Transaction is not valid.");
+        if(!transaction.signoCheck()) throw new Error("Transaction is not valid.");
         this.pendingTransactions.push(transaction);
     }
 
@@ -51,7 +52,7 @@ export class BlockChain{
         return true;
     }
 
-    isValidTr(hash: string, root: MerkleTree){
+    isInTree(hash: string, root: MerkleTree){
         const hashB = Buffer.from(convertToBytes(hash));
         return root.verify(root.getProof(hashB), hashB, Buffer.from(convertToBytes(root.getHexRoot())));
     }

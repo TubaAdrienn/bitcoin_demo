@@ -10,7 +10,7 @@ export class Transaction{
         this.hash = hashFn(from+to+amount+this.ts+this.sign);
     }
 
-    isValid(){
+    signoCheck(){
         if(this.from == null) return true;
         if(!this.sign || this.sign.length==0) throw new Error('No signature.');
 
